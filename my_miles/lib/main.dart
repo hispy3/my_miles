@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_smartcar_auth/flutter_smartcar_auth.dart';
 import 'package:my_miles/repository/repository.dart';
-import 'package:my_miles/views/vehicle_info.dart';
+import 'package:my_miles/views/Item_view.dart';
 
 import 'models/vehicle_info_model.dart';
 
@@ -34,15 +32,19 @@ class _SmartCarAuthMenu extends StatefulWidget {
 
 class _SmartCarAuthMenuState extends State<_SmartCarAuthMenu> {
   MyMilesRepository repository = MyMilesRepository();
-  late String token;
+  String? token;
   List<String> vehicleList = List.empty(growable: true);
-  VehicleInfoModel? vehicleInfoModelData;
+  VehicleInfoModel? vehicleInfoModelData,
+      odometerInfoModelData,
+      evBatteryLevelInfoModelData,
+      evBatteryCapacityInfoModelData;
 
   @override
   void initState() {
     super.initState();
     Smartcar.onSmartcarResponse.listen(_handleSmartCarResponse);
     repository.myMilesSetup();
+    checkTokenAvailability();
   }
 
   void _handleSmartCarResponse(SmartcarAuthResponse response) {
@@ -87,15 +89,59 @@ class _SmartCarAuthMenuState extends State<_SmartCarAuthMenu> {
     ).then((_) => scaffoldMessenger.hideCurrentMaterialBanner());
   }
 
-  Future<void> getAccessToken(String code) async {
+  void checkTokenAvailability() async {
+    String? isTokenAvailable = await repository.getToken();
+    String? bearerToken;
+    if (isTokenAvailable != null) {
+      bearerToken = await repository.getToken();
+      if (bearerToken != null) {
+        List<String> vehicleListRep =
+            await repository.getVehicleData(bearerToken);
+
+        final response = await Future.wait([
+          repository.getVehicleInfo(vehicleListRep.first, bearerToken),
+          repository.getOdometerInfo(vehicleListRep.first, bearerToken),
+          repository.getEVBatteryLevel(vehicleListRep.first, bearerToken),
+          repository.getEVBatteryCapacity(vehicleListRep.first, bearerToken),
+        ]);
+
+        vehicleInfoModelData = response[0];
+        odometerInfoModelData = response[1];
+        evBatteryLevelInfoModelData = response[2];
+        evBatteryCapacityInfoModelData = response[3];
+
+        setState(() {
+          token = bearerToken;
+          vehicleList = vehicleListRep;
+        });
+      }
+    }
+  }
+
+  Future<void> getAccessToken(String code, {bool isTokenSaved = false}) async {
+    String? bearerToken;
+
     if (code.isNotEmpty) {
-      String bearertoken = await repository.fetchAccessToken(code);
+      bearerToken = await repository.fetchAccessToken(code);
+    }
+
+    if (bearerToken != null) {
       List<String> vehicleListRep =
-          await repository.getVehicleData(bearertoken);
-      vehicleInfoModelData =
-          await repository.getVehicleInfo(vehicleListRep.first, bearertoken);
+          await repository.getVehicleData(bearerToken);
+      final response = await Future.wait([
+        repository.getVehicleInfo(vehicleListRep.first, bearerToken),
+        repository.getOdometerInfo(vehicleListRep.first, bearerToken),
+        repository.getEVBatteryLevel(vehicleListRep.first, bearerToken),
+        repository.getEVBatteryCapacity(vehicleListRep.first, bearerToken),
+      ]);
+
+      vehicleInfoModelData = response[0];
+      odometerInfoModelData = response[1];
+      evBatteryLevelInfoModelData = response[2];
+      evBatteryCapacityInfoModelData = response[3];
+
       setState(() {
-        token = bearertoken;
+        token = bearerToken;
         vehicleList = vehicleListRep;
       });
     }
@@ -129,50 +175,84 @@ class _SmartCarAuthMenuState extends State<_SmartCarAuthMenu> {
               visible: vehicleList.isNotEmpty,
               child: Card(
                 elevation: 3,
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text('Make - ${vehicleInfoModelData?.make ?? ''}'),
-                    ),
-                    ListTile(
-                      title:
-                          Text('Model - ${vehicleInfoModelData?.model ?? ''}'),
-                    ),
-                    ListTile(
-                      title: Text('Year - ${vehicleInfoModelData?.year ?? ''}'),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Vehicle Info',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ItemView(
+                        title: 'Make',
+                        value: vehicleInfoModelData?.make ?? '',
+                      ),
+                      ItemView(
+                        title: 'Model',
+                        value: vehicleInfoModelData?.model ?? '',
+                      ),
+                      ItemView(
+                          title: 'Year',
+                          value: '${vehicleInfoModelData?.year ?? ''}'),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Odometer',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ItemView(
+                        title: 'Distance',
+                        value: '${odometerInfoModelData?.distance ?? '0'}km',
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'EV Battery Level',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ItemView(
+                        title: 'PerCent Remaining',
+                        value:
+                            '${(evBatteryLevelInfoModelData?.percentRemaining ?? 0) * 100}%',
+                      ),
+                      ItemView(
+                        title: 'Range',
+                        value: '${evBatteryLevelInfoModelData?.range ?? '0'}km',
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'EV Battery Capacity',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ItemView(
+                        title: 'Capacity',
+                        value:
+                            '${evBatteryCapacityInfoModelData?.capacity ?? '0'}kWh',
+                      ),
+                    ],
+                  ),
                 ),
-              )
-
-              // ListView.separated(
-              //     shrinkWrap: true,
-              //     scrollDirection: Axis.vertical,
-              //     itemBuilder: (context, index) {
-              //       return Card(
-              //         elevation: 3,
-              //         child: ListTile(
-              //           title: Text(vehicleList[index]),
-              //           trailing: const Icon(Icons.navigate_next),
-              //           onTap: () {
-              //             Navigator.push(
-              //                 context,
-              //                 MaterialPageRoute(
-              //                     builder: (context) => VehicleInfo(
-              //                           vehicleId: vehicleList[index],
-              //                           accessToken: token,
-              //                         )));
-              //           },
-              //         ),
-              //       );
-              //     },
-              //     separatorBuilder: (context, index) {
-              //       return const SizedBox(
-              //         height: 10,
-              //       );
-              //     },
-              //     itemCount: vehicleList.length),
-              )
+              ))
         ],
       ),
     );

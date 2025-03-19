@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants/app_strings.dart';
 import 'package:flutter_smartcar_auth/flutter_smartcar_auth.dart';
-
 import '../models/vehicle_id_model.dart';
 import '../models/vehicle_info_model.dart';
+
 
 class MyMilesRepository {
   Future<void> myMilesSetup() async {
@@ -38,6 +38,7 @@ class MyMilesRepository {
       },
     );
     final data = json.decode(response.body);
+    await saveToken(data['access_token']);
     return data['access_token'];
   }
 
@@ -63,5 +64,55 @@ class MyMilesRepository {
     VehicleInfoModel data =
         VehicleInfoModel.fromJson(json.decode(response.body));
     return data;
+  }
+
+  Future<dynamic> getOdometerInfo(String vehicleId, String accessToken) async {
+    final response = await http.get(
+      Uri.parse('https://api.smartcar.com/v2.0/vehicles/$vehicleId/odometer'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    VehicleInfoModel data =
+        VehicleInfoModel.fromJson(json.decode(response.body));
+    return data;
+  }
+
+  Future<dynamic> getEVBatteryLevel(
+      String vehicleId, String accessToken) async {
+    final response = await http.get(
+      Uri.parse('https://api.smartcar.com/v2.0/vehicles/$vehicleId/battery'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    VehicleInfoModel data =
+        VehicleInfoModel.fromJson(json.decode(response.body));
+    return data;
+  }
+
+  Future<dynamic> getEVBatteryCapacity(
+      String vehicleId, String accessToken) async {
+    final response = await http.get(
+      Uri.parse(
+          'https://api.smartcar.com/v2.0/vehicles/$vehicleId/battery/capacity'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    VehicleInfoModel data =
+        VehicleInfoModel.fromJson(json.decode(response.body));
+    return data;
+  }
+
+  Future<void> saveToken(String token) async {
+    // final SecureStorage prefs = SecureStorage();
+    // prefs.saveToken(token);
+  }
+
+  Future<String?> getToken() async {
+    // final SecureStorage prefs = SecureStorage();
+    // final String? token = await prefs.getToken();
+    // return token;
   }
 }
