@@ -13,7 +13,7 @@ class ItemView extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return Container(
       margin: const EdgeInsets.only(
-        top: 20,
+        top: 10,
         left: 25,
         right: 25,
       ),

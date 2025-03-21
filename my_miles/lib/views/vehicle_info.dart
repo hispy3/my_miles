@@ -73,7 +73,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
             child: Column(
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
+                  padding: EdgeInsets.only(left: 25, right: 25, bottom: 15,top:20),
                   child: Center(
                     child: Text("Vehicle DashBoard",
                         style: TextStyle(
@@ -84,7 +84,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
+                  padding: EdgeInsets.only(left: 25, right: 15, bottom: 20),
                   child: Center(
                     child: Text("Hey, your car is all set!",
                         style: TextStyle(
@@ -95,9 +95,9 @@ class _VehicleInfoState extends State<VehicleInfo> {
                   ),
                 ),
                  Padding(
-                  padding: const EdgeInsets.only(left: 25, right: 25, bottom: 20),
+                  padding: const EdgeInsets.only(left: 25, right: 25),
                   child: Center(
-                    child: Text("VIN : ${vinInfoModelData?.vin ?? ''}",
+                    child: Text("#VIN : ${vinInfoModelData?.vin ?? ''}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -145,7 +145,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                               "Make",
                               style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w200,
                                   color: black),
                             ),
                           ],
@@ -170,7 +170,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                             const Text("Model",
                                 style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                                    fontWeight: FontWeight.w200,
                                     color: black)),
                           ],
                         ),
@@ -195,7 +195,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                               "Year",
                               style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w200,
                                   color: black),
                             ),
                           ],
@@ -206,7 +206,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                 ),
 
                 const Padding(
-                  padding: EdgeInsets.only(left: 25, right: 25,top: 15),
+                  padding: EdgeInsets.only(left: 25, right: 25,top: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
