@@ -48,7 +48,7 @@ class ItemView extends StatelessWidget {
             ),
             Expanded(
               child: SizedBox(
-                width: (size.width - 90) * 0.7,
+                width: (size.width - 90) * 0.5,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,17 +65,21 @@ class ItemView extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.normal,
-                        color: black),
-                  )
-                ],
+              child: SizedBox(
+                width: (size.width - 90) * 0.7,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      value,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: black),
+                    )
+                  ],
+                ),
               ),
             )
           ],

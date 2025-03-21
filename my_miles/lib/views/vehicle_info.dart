@@ -94,6 +94,17 @@ class _VehicleInfoState extends State<VehicleInfo> {
                         )),
                   ),
                 ),
+                 Padding(
+                  padding: const EdgeInsets.only(left: 25, right: 25, bottom: 20),
+                  child: Center(
+                    child: Text("VIN : ${vinInfoModelData?.vin ?? ''}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: mainFontColor,
+                        )),
+                  ),
+                ),
                 Container(
                   margin: const EdgeInsets.only(
                     top: 20,
@@ -121,7 +132,7 @@ class _VehicleInfoState extends State<VehicleInfo> {
                         Column(
                           children: [
                             Text(
-                              vinInfoModelData?.make ?? '',
+                              vehicleInfoModelData?.make ?? '',
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.normal,
@@ -191,6 +202,29 @@ class _VehicleInfoState extends State<VehicleInfo> {
                         ),
                       ],
                     ),
+                  ),
+                ),
+
+                const Padding(
+                  padding: EdgeInsets.only(left: 25, right: 25,top: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text("Details",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: mainFontColor,
+                                  )),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 ItemView(

@@ -20,7 +20,7 @@ class MyMilesRepository {
           SmartcarPermission.readFuel,
           SmartcarPermission.readCharge,
         ],
-        mode: SmartcarMode.test,
+        mode: SmartcarMode.simulated,
       ),
     );
   }
