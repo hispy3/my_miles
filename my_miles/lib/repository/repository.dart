@@ -5,7 +5,6 @@ import 'package:flutter_smartcar_auth/flutter_smartcar_auth.dart';
 import '../models/vehicle_id_model.dart';
 import '../models/vehicle_info_model.dart';
 
-
 class MyMilesRepository {
   Future<void> myMilesSetup() async {
     await Smartcar.setup(
@@ -13,11 +12,12 @@ class MyMilesRepository {
         clientId: clientId,
         redirectUri: redirectUri,
         scopes: [
+          SmartcarPermission.readVin,
+          SmartcarPermission.readVehicleInfo,
+          SmartcarPermission.readExtendedVehicleInfo,
           SmartcarPermission.readOdometer,
           SmartcarPermission.readBattery,
           SmartcarPermission.readFuel,
-          SmartcarPermission.readVehicleInfo,
-          SmartcarPermission.readExtendedVehicleInfo,
           SmartcarPermission.readCharge,
         ],
         mode: SmartcarMode.test,
@@ -100,6 +100,19 @@ class MyMilesRepository {
         'Authorization': 'Bearer $accessToken',
       },
     );
+    VehicleInfoModel data =
+        VehicleInfoModel.fromJson(json.decode(response.body));
+    return data;
+  }
+
+  Future<dynamic> getVin(String vehicleId, String accessToken) async {
+    final response = await http.get(
+      Uri.parse('https://api.smartcar.com/v2.0/vehicles/$vehicleId/vin'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
     VehicleInfoModel data =
         VehicleInfoModel.fromJson(json.decode(response.body));
     return data;

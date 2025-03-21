@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smartcar_auth/flutter_smartcar_auth.dart';
 import 'package:my_miles/repository/repository.dart';
-import 'package:my_miles/views/Item_view.dart';
+import 'package:my_miles/views/vehicle_info.dart';
 
+
+import 'constants/colors.dart';
 import 'models/vehicle_info_model.dart';
 
 void main() {
@@ -95,25 +97,10 @@ class _SmartCarAuthMenuState extends State<_SmartCarAuthMenu> {
     if (isTokenAvailable != null) {
       bearerToken = await repository.getToken();
       if (bearerToken != null) {
-        List<String> vehicleListRep =
-            await repository.getVehicleData(bearerToken);
-
-        final response = await Future.wait([
-          repository.getVehicleInfo(vehicleListRep.first, bearerToken),
-          repository.getOdometerInfo(vehicleListRep.first, bearerToken),
-          repository.getEVBatteryLevel(vehicleListRep.first, bearerToken),
-          repository.getEVBatteryCapacity(vehicleListRep.first, bearerToken),
-        ]);
-
-        vehicleInfoModelData = response[0];
-        odometerInfoModelData = response[1];
-        evBatteryLevelInfoModelData = response[2];
-        evBatteryCapacityInfoModelData = response[3];
-
-        setState(() {
-          token = bearerToken;
-          vehicleList = vehicleListRep;
-        });
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => VehicleInfo(bearerToken: bearerToken!)));
       }
     }
   }
@@ -126,135 +113,77 @@ class _SmartCarAuthMenuState extends State<_SmartCarAuthMenu> {
     }
 
     if (bearerToken != null) {
-      List<String> vehicleListRep =
-          await repository.getVehicleData(bearerToken);
-      final response = await Future.wait([
-        repository.getVehicleInfo(vehicleListRep.first, bearerToken),
-        repository.getOdometerInfo(vehicleListRep.first, bearerToken),
-        repository.getEVBatteryLevel(vehicleListRep.first, bearerToken),
-        repository.getEVBatteryCapacity(vehicleListRep.first, bearerToken),
-      ]);
-
-      vehicleInfoModelData = response[0];
-      odometerInfoModelData = response[1];
-      evBatteryLevelInfoModelData = response[2];
-      evBatteryCapacityInfoModelData = response[3];
-
-      setState(() {
-        token = bearerToken;
-        vehicleList = vehicleListRep;
-      });
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => VehicleInfo(bearerToken: bearerToken!)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Miles Auth'),
-      ),
-      body: Column(
-        children: [
-          Visibility(
-            visible: vehicleList.isEmpty,
+        backgroundColor: primary,
+        body: SafeArea(
+            child: SingleChildScrollView(
+                child: Column(children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  MaterialButton(
-                    onPressed: () async {
-                      await Smartcar.launchAuthFlow();
-                    },
-                    child: const Text("Launch Auth Flow"),
-                  ),
-                ],
+              child: Text("Connect Your Car",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: mainFontColor,
+                  )),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
+            child: Center(
+              child: Text("Seamlessly Connect & Monitor Your Car",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: mainFontColor,
+                  )),
+            ),
+          ),
+          Container(
+            height: 50,
+          ),
+          Container(
+            width: 120,
+            height: 120,
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    image: AssetImage("lib/assets/steering-wheel.png"),
+                    fit: BoxFit.cover)),
+          ),
+          Container(
+            height: 80,
+          ),
+          GestureDetector(
+            onTap: () async {
+              await Smartcar.launchAuthFlow();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+              decoration: BoxDecoration(
+                  color: buttoncolor, borderRadius: BorderRadius.circular(25)),
+              child: const Center(
+                child: Text(
+                  "Connect Your Car",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ),
-          Visibility(
-              visible: vehicleList.isNotEmpty,
-              child: Card(
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Vehicle Info',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ItemView(
-                        title: 'Make',
-                        value: vehicleInfoModelData?.make ?? '',
-                      ),
-                      ItemView(
-                        title: 'Model',
-                        value: vehicleInfoModelData?.model ?? '',
-                      ),
-                      ItemView(
-                          title: 'Year',
-                          value: '${vehicleInfoModelData?.year ?? ''}'),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Odometer',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ItemView(
-                        title: 'Distance',
-                        value: '${odometerInfoModelData?.distance ?? '0'}km',
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'EV Battery Level',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ItemView(
-                        title: 'PerCent Remaining',
-                        value:
-                            '${(evBatteryLevelInfoModelData?.percentRemaining ?? 0) * 100}%',
-                      ),
-                      ItemView(
-                        title: 'Range',
-                        value: '${evBatteryLevelInfoModelData?.range ?? '0'}km',
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'EV Battery Capacity',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ItemView(
-                        title: 'Capacity',
-                        value:
-                            '${evBatteryCapacityInfoModelData?.capacity ?? '0'}kWh',
-                      ),
-                    ],
-                  ),
-                ),
-              ))
-        ],
-      ),
-    );
+        ]))));
   }
 }

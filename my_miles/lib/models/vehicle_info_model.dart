@@ -2,16 +2,18 @@ class VehicleInfoModel {
   String? id;
   String? make;
   String? model;
+  String? vin;
   int? year;
   int? capacity;
   int? range;
-  double? percentRemaining;
+  num? percentRemaining;
   int? distance;
 
   VehicleInfoModel(
       {this.id,
         this.make,
         this.model,
+        this.vin,
         this.year,
         this.capacity,
         this.range,
@@ -22,6 +24,7 @@ class VehicleInfoModel {
     id = json['id'];
     make = json['make'];
     model = json['model'];
+    vin = json['vin'];
     year = json['year'];
     capacity = json['capacity'];
     range = json['range'];
@@ -34,6 +37,7 @@ class VehicleInfoModel {
     data['id'] = id;
     data['make'] = make;
     data['model'] = model;
+    data['vin'] = vin;
     data['year'] = year;
     data['capacity'] = capacity;
     data['range'] = range;
